@@ -11,4 +11,7 @@ Desktop.ini
 
 # Tooling
 node_modules/
+
+# Vercel — .env* matters: `vercel link` writes an OIDC token to .env.local
 .vercel
+.env*
