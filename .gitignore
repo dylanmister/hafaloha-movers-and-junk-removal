@@ -1,0 +1,14 @@
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Tooling
+node_modules/
+.vercel
