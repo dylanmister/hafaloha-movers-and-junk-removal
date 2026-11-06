@@ -1,0 +1,15 @@
+// Cloudflare Workers: serves the files in public/ as a static site at hafaloha.us and
+// www.hafaloha.us. Cloudflare creates the DNS records and HTTPS certificates for both.
+// Publish changes with `npx wrangler deploy` (log in once per computer: `npx wrangler login`).
+// Only public/ is uploaded, so the README and local files never go online.
+{
+  "name": "hafaloha",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./public"
+  },
+  "routes": [
+    { "pattern": "hafaloha.us", "custom_domain": true },
+    { "pattern": "www.hafaloha.us", "custom_domain": true }
+  ]
+}
