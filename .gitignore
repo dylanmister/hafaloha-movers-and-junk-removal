@@ -16,5 +16,7 @@ node_modules/
 .vercel
 .env*
 
-# Cloudflare — wrangler's local state
+# Cloudflare — wrangler's local state, and .dev.vars, which holds the Stripe keys for local
+# testing. The repo is public: no key may ever be committed.
 .wrangler/
+.dev.vars*

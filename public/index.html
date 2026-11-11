@@ -222,6 +222,9 @@
   .promo-shake { animation: promo-shake .4s ease; }
   @keyframes promo-shake { 20%, 60% { translate: -6px 0; } 40%, 80% { translate: 6px 0; } }
 
+  /* "Pay now" steps aside while Stripe's form is showing. */
+  [data-pay-btn][hidden], #payCatalog[hidden], #payCatalog [hidden] { display: none; } /* Tailwind's .flex and .inline-flex would otherwise beat the hidden attribute. */
+
   @media (prefers-reduced-motion: reduce) {
     /* !important because Tailwind's .scroll-smooth utility out-specifies a bare
        `html` selector — without it, long CTA jumps would still animate. */
@@ -291,6 +294,8 @@
       <a href="#services" class="rounded-lg px-3 py-2 text-sm font-semibold text-navy/75 transition hover:bg-navy/5 hover:text-navy">Services</a>
       <a href="#about"    class="rounded-lg px-3 py-2 text-sm font-semibold text-navy/75 transition hover:bg-navy/5 hover:text-navy">About</a>
       <a href="#faq"      class="rounded-lg px-3 py-2 text-sm font-semibold text-navy/75 transition hover:bg-navy/5 hover:text-navy">FAQ</a>
+      <!-- Shown with the "Pay online" section, once online payment is set up. -->
+      <a href="#pay"      data-pay-link hidden class="rounded-lg px-3 py-2 text-sm font-semibold text-navy/75 transition hover:bg-navy/5 hover:text-navy">Pay online</a>
       <button type="button" data-promo-open data-cta="promo-nav" aria-haspopup="dialog" class="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-bold text-coral-dark transition hover:bg-navy/5">
         <svg class="h-4 w-4 text-coral" viewBox="0 0 128 128" aria-hidden="true"><use href="#i-hibiscus"/></svg>
         Monticello Special
@@ -321,6 +326,7 @@
       <a href="#services" class="rounded-xl px-3 py-3 font-semibold text-navy/80 transition hover:bg-white">Services</a>
       <a href="#about"    class="rounded-xl px-3 py-3 font-semibold text-navy/80 transition hover:bg-white">About</a>
       <a href="#faq"      class="rounded-xl px-3 py-3 font-semibold text-navy/80 transition hover:bg-white">FAQ</a>
+      <a href="#pay"      data-pay-link hidden class="rounded-xl px-3 py-3 font-semibold text-navy/80 transition hover:bg-white">Pay online</a>
       <button type="button" data-promo-open data-cta="promo-menu" aria-haspopup="dialog" class="flex items-center gap-2 rounded-xl px-3 py-3 text-left font-bold text-coral-dark transition hover:bg-white">
         <svg class="h-4 w-4 text-coral" viewBox="0 0 128 128" aria-hidden="true"><use href="#i-hibiscus"/></svg>
         Monticello Special
@@ -749,9 +755,6 @@
     <div class="lg:sticky lg:top-28 lg:self-start">
       <p class="text-sm font-bold uppercase tracking-wider text-teal-light">Book online</p>
       <h2 class="mt-2 font-display text-3xl font-extrabold tracking-tight sm:text-4xl">Let's get your date on the calendar</h2>
-      <p class="mt-4 leading-relaxed text-white/75">
-        It takes about a minute, and there's no account to make. We'll call or text you back to confirm the arrival window and the rate.
-      </p>
 
       <div class="mt-8 rounded-2xl bg-white/5 p-5 ring-1 ring-white/10">
         <p class="font-semibold text-white">Rather just talk to someone?</p>
@@ -955,58 +958,128 @@
         </div>
 
         <button type="submit"
-                class="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl bg-teal px-6 py-4 text-base font-bold text-white shadow-lift transition hover:bg-teal-dark active:translate-y-px">
-          Book now
+                class="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl bg-teal px-6 py-4 text-base font-bold text-white shadow-lift transition hover:bg-teal-dark active:translate-y-px disabled:cursor-wait disabled:opacity-70">
+          <span data-btn-label>Book now</span>
           <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg>
         </button>
 
         <p class="mt-3 text-center text-sm leading-relaxed text-navy/60">
-          This opens an email to <a href="mailto:hafalohamovers@gmail.com" class="font-semibold text-teal underline decoration-teal/30 underline-offset-2 hover:text-teal-dark">hafalohamovers@gmail.com</a> with your details filled in — nothing is sent until you hit send in your email app.
+          Your request comes straight to us, and you'll see a confirmation right here.
         </p>
       </form>
 
-      <!-- Success state (revealed after a valid submit) -->
+      <!-- Shown once Web3Forms has the request. -->
       <div id="bookingSuccess" hidden tabindex="-1">
-        <div class="text-center">
+        <div class="py-6 text-center">
           <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-leaf/10 text-leaf">
             <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
           </span>
-          <h3 class="mt-5 font-display text-2xl font-extrabold text-navy">Almost there — send the email</h3>
+          <h3 class="mt-5 font-display text-2xl font-extrabold text-navy">Form submitted!</h3>
           <p class="mx-auto mt-3 max-w-md leading-relaxed text-navy/70">
-            Your email app should have opened with the request below already written out. Hit send and we'll take it from there.
+            Thanks! We'll call or text you back to confirm the arrival window and the rate.
           </p>
         </div>
 
-        <div class="mt-6 rounded-xl bg-sand p-4 ring-1 ring-navy/10">
-          <div class="flex items-center justify-between gap-3">
-            <p class="text-sm font-bold text-navy">Your request</p>
-            <button type="button" id="copyBtn"
-                    class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-bold text-navy ring-1 ring-navy/15 transition hover:ring-navy/30">
-              <svg class="h-4 w-4 text-teal" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M13 5H5a2 2 0 00-2 2v8"/></svg>
-              <span id="copyBtnLabel">Copy</span>
-            </button>
-          </div>
-          <pre id="summaryText" class="mt-3 max-h-64 overflow-auto whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-navy/80"></pre>
+        <!-- Bin cleaning has a set price, so it can be paid online right away ("Paying online" in the
+             JS). Shown only for an exact number of bins, and only once the payment service answers.
+             "Pay now" goes to Stripe's own secure checkout page, which sends the customer back here. -->
+        <div data-pay hidden class="mx-auto mb-2 max-w-md rounded-2xl bg-sand p-5 text-center ring-1 ring-navy/10">
+          <p data-pay-title tabindex="-1" class="font-display text-lg font-bold text-navy outline-none">Want to pay now?</p>
+          <p class="mt-1 text-sm leading-relaxed text-navy/70">Pay securely online by card or Apple Pay, or pay after the cleaning.</p>
+          <button type="button" data-pay-btn
+                  class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-dark px-6 py-3 text-sm font-bold text-white transition hover:bg-navy disabled:cursor-wait disabled:opacity-70 sm:w-auto">
+            <span data-btn-label>Pay now</span>
+            <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg>
+          </button>
+          <p data-pay-error tabindex="-1" class="mt-3 text-sm font-semibold text-red-700" role="alert" hidden></p>
         </div>
+      </div>
 
-        <p class="mt-4 text-center text-sm leading-relaxed text-navy/65">
-          Email app didn't open? Copy the summary above and text it to
-          <a href="sms:+19497314378" class="font-semibold text-teal underline decoration-teal/30 underline-offset-2 hover:text-teal-dark">(949) 731-4378</a>,
-          or just <a href="tel:+19497314378" class="font-semibold text-teal underline decoration-teal/30 underline-offset-2 hover:text-teal-dark">give us a call</a>.
-        </p>
-
-        <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-          <button type="button" id="reopenMailBtn" class="rounded-xl bg-teal px-5 py-3 text-sm font-bold text-white transition hover:bg-teal-dark">Reopen my email app</button>
-          <button type="button" id="editBtn" class="rounded-xl px-5 py-3 text-sm font-bold text-navy ring-1 ring-navy/15 transition hover:bg-sand">Edit my request</button>
+      <!-- Shown when Stripe sends a customer back here after paying (?checkout=…). It only says a
+           payment went through once the server has checked with Stripe ("Back from paying" in the JS). -->
+      <div id="paymentResult" hidden tabindex="-1" class="py-6 text-center">
+        <div data-result-icon="paid" hidden>
+          <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-leaf/10 text-leaf">
+            <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          </span>
         </div>
+        <div data-result-icon="info" hidden>
+          <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-lagoon-light text-teal-dark">
+            <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+          </span>
+        </div>
+        <h3 id="paymentResultTitle" class="mt-5 font-display text-2xl font-extrabold text-navy">Checking your payment…</h3>
+        <p id="paymentResultText" class="mx-auto mt-3 max-w-md leading-relaxed text-navy/70"></p>
+        <button type="button" id="paymentResultBack" class="mt-6 rounded-xl px-5 py-3 text-sm font-bold text-navy ring-1 ring-navy/15 transition hover:bg-sand">Book something else</button>
       </div>
     </div>
   </div>
 </section>
 
+<!-- ============================================================= -->
+<!-- PAY ONLINE                                                    -->
+<!-- The services and prices come from the Stripe Dashboard's      -->
+<!-- Product catalog through /api/catalog in src/worker.js, so     -->
+<!-- changing them in Stripe changes them here (README:            -->
+<!-- "Payments"). Paying happens on Stripe's own                   -->
+<!-- checkout page. The area and its menu links stay hidden until  -->
+<!-- the catalog arrives, so the page never shows a dead button.   -->
+<!-- ============================================================= -->
+<div id="payArea" hidden>
+  <div class="wave bg-navy-deep text-sand" aria-hidden="true">
+    <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,22 C260,54 520,14 820,36 C1080,56 1280,18 1440,40 L1440,64 L0,64 Z" fill="currentColor"/></svg>
+  </div>
+
+  <section id="pay" class="anchor relative overflow-hidden bg-sand py-16 sm:py-24" aria-labelledby="payTitle">
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+      <div class="absolute -right-40 -top-40 h-[30rem] w-[30rem] rounded-full bg-[radial-gradient(circle,rgba(19,165,160,.16),transparent_65%)]"></div>
+      <div class="absolute -bottom-48 -left-40 h-[28rem] w-[28rem] rounded-full bg-[radial-gradient(circle,rgba(249,178,51,.14),transparent_65%)]"></div>
+      <svg class="sway absolute -bottom-6 -right-14 hidden h-72 w-auto origin-bottom text-teal/[.07] lg:block" viewBox="0 0 244 300"><use href="#i-palm"/></svg>
+    </div>
+
+    <div class="relative mx-auto max-w-content px-4 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-2xl text-center">
+        <p class="text-sm font-bold uppercase tracking-wider text-teal-dark">Pay online</p>
+        <h2 id="payTitle" class="mt-2 font-display text-3xl font-extrabold tracking-tight text-navy sm:text-4xl">Pay for your service</h2>
+        <p class="mx-auto mt-4 max-w-xl leading-relaxed text-navy/70">
+          Pick what you're paying for, then check out on Stripe's secure page. Your card details never touch our site.
+        </p>
+        <!-- The only ways the site takes payment, Apple Pay first: cards, typed in or through Apple
+             Pay. PAYMENT_METHODS in src/worker.js enforces it; change the two together. -->
+        <ul id="payMethods" class="mt-6 flex flex-wrap items-center justify-center gap-2" aria-label="Ways to pay">
+          <li class="inline-flex items-center gap-1.5 rounded-full bg-black px-4 py-2 text-sm font-semibold text-white shadow-card">
+            <svg class="h-3.5 w-3.5 text-sun-light" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sparkle"/></svg>
+            Apple Pay
+          </li>
+          <li class="inline-flex items-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-navy shadow-card ring-1 ring-navy/10">Credit or debit card</li>
+        </ul>
+      </div>
+
+      <!-- Where the result shows when Stripe sends a customer back ("Back from paying" in the JS
+           moves #paymentResult in here). -->
+      <div id="payResultCard" hidden class="mx-auto mt-10 max-w-xl rounded-2xl bg-white px-6 shadow-lift ring-1 ring-navy/5"></div>
+
+      <!-- The Monticello Special's card, then one card per product in the Stripe catalog ("Pay online" in the JS). -->
+      <div id="payCatalog" class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3"></div>
+
+      <p class="mx-auto mt-10 max-w-2xl text-center text-sm leading-relaxed text-navy/70">
+        6 or more bins, or not sure which to pick? Call or text
+        <a href="sms:+19497314378" class="font-semibold text-teal-dark underline decoration-teal/30 underline-offset-2 hover:text-navy">(949) 731-4378</a>.
+        Live in Monticello?
+        <button type="button" data-promo-open data-cta="promo-pay" aria-haspopup="dialog" class="font-semibold text-teal-dark underline decoration-teal/30 underline-offset-2 hover:text-navy">See your community special</button>.
+      </p>
+    </div>
+  </section>
+
+  <div class="wave bg-sand text-navy-900" aria-hidden="true">
+    <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,30 C200,62 420,4 700,28 C980,52 1210,8 1440,30 L1440,64 L0,64 Z" fill="currentColor"/></svg>
+  </div>
+</div>
+
 </main>
 
-<div class="wave bg-navy-deep text-navy-900" aria-hidden="true">
+<!-- Hidden when the "Pay online" area shows: that area ends with its own wave into the footer. -->
+<div class="wave bg-navy-deep text-navy-900" data-wave-before-footer aria-hidden="true">
   <svg viewBox="0 0 1440 64" preserveAspectRatio="none"><path d="M0,30 C200,62 420,4 700,28 C980,52 1210,8 1440,30 L1440,64 L0,64 Z" fill="currentColor"/></svg>
 </div>
 
@@ -1275,50 +1348,41 @@
               </div>
             </div>
 
-            <button type="submit" class="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-dark px-6 py-4 text-base font-bold text-white shadow-lift transition hover:bg-navy active:translate-y-px">
-              Reserve My Cleaning
+            <button type="submit" class="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-teal-dark px-6 py-4 text-base font-bold text-white shadow-lift transition hover:bg-navy active:translate-y-px disabled:cursor-wait disabled:opacity-70">
+              <span data-btn-label>Reserve My Cleaning</span>
               <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg>
             </button>
             <p class="mt-3 text-center text-sm leading-relaxed text-navy/70">
-              This opens an email to <a href="mailto:hafalohamovers@gmail.com" class="font-semibold text-teal-dark underline decoration-teal/30 underline-offset-2 hover:text-navy">hafalohamovers@gmail.com</a> with your details filled in — nothing is sent until you hit send in your email app.
+              Your reservation comes straight to us, and you'll see a confirmation right here.
             </p>
           </form>
         </div>
 
-        <!-- There's no backend and a page can't tell whether an email got sent, so this says what's
-             true: the reservation isn't in until they hit send. Swap the wording if that changes. -->
-        <div id="promoStepSend" class="promo-step" role="group" aria-labelledby="promoSendTitle" tabindex="-1" hidden>
-          <div class="text-center">
-            <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-lagoon-light text-teal-dark">
-              <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3.5 7.5L12 13l8.5-5.5"/></svg>
+        <!-- Shown once Web3Forms has the reservation. -->
+        <div id="promoStepSend" class="promo-step" role="group" aria-labelledby="promoSentTitle" tabindex="-1" hidden>
+          <div class="py-4 text-center">
+            <span class="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-leaf/10 text-leaf">
+              <svg class="h-9 w-9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
             </span>
-            <h3 id="promoSendTitle" class="mt-5 font-display text-2xl font-extrabold text-navy">Almost there — send the email</h3>
+            <h3 id="promoSentTitle" class="mt-5 font-display text-2xl font-extrabold text-navy">Form submitted!</h3>
             <p class="mx-auto mt-3 max-w-md leading-relaxed text-navy/70">
-              Your email app should have opened with the reservation below already written out. <strong class="font-bold text-navy">Your cleaning isn't reserved until you hit send.</strong> Then we'll take it from there.
+              Thanks! Your reservation for <strong class="font-bold text-navy">Thursday, November 19, 2026</strong> is in. Just leave your bins accessible that day.
             </p>
           </div>
-
-          <div class="mt-6 rounded-xl bg-sand p-4 ring-1 ring-navy/10">
-            <div class="flex items-center justify-between gap-3">
-              <p class="text-sm font-bold text-navy">Your reservation</p>
-              <button type="button" id="promoCopyBtn"
-                      class="inline-flex items-center gap-1.5 rounded-lg bg-white px-3 py-2 text-sm font-bold text-navy ring-1 ring-navy/15 transition hover:ring-navy/30">
-                <svg class="h-4 w-4 text-teal" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M13 5H5a2 2 0 00-2 2v8"/></svg>
-                <span id="promoCopyBtnLabel">Copy</span>
-              </button>
-            </div>
-            <pre id="promoSummaryText" tabindex="0" aria-label="Your reservation" class="mt-3 max-h-56 overflow-auto whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-navy/80"></pre>
+          <!-- Pay the special now through Stripe, or on the day ("Paying online" in the JS). "Pay now"
+               goes to Stripe's own secure checkout page, which sends the customer back to the site. -->
+          <div data-pay hidden class="mx-auto max-w-md rounded-2xl bg-sand p-5 text-center ring-1 ring-navy/10">
+            <p data-pay-title tabindex="-1" class="font-display text-lg font-bold text-navy outline-none">Want to pay now?</p>
+            <p class="mt-1 text-sm leading-relaxed text-navy/70">Pay securely online by card or Apple Pay, or pay with Zelle, Venmo or cash after the cleaning.</p>
+            <button type="button" data-pay-btn
+                    class="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-teal-dark px-6 py-3 text-sm font-bold text-white transition hover:bg-navy disabled:cursor-wait disabled:opacity-70 sm:w-auto">
+              <span data-btn-label>Pay now</span>
+              <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg>
+            </button>
+            <p data-pay-error tabindex="-1" class="mt-3 text-sm font-semibold text-red-700" role="alert" hidden></p>
           </div>
-
-          <p class="mt-4 text-center text-sm leading-relaxed text-navy/70">
-            Email app didn't open? Copy the summary above and text it to
-            <a href="sms:+19497314378" class="font-semibold text-teal-dark underline decoration-teal/30 underline-offset-2 hover:text-navy">(949) 731-4378</a>,
-            or just <a href="tel:+19497314378" class="font-semibold text-teal-dark underline decoration-teal/30 underline-offset-2 hover:text-navy">give us a call</a>.
-          </p>
-
-          <div class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
-            <button type="button" id="promoReopenMailBtn" class="rounded-xl bg-teal-dark px-5 py-3 text-sm font-bold text-white transition hover:bg-navy">Reopen my email app</button>
-            <button type="button" id="promoEditBtn" class="rounded-xl px-5 py-3 text-sm font-bold text-navy ring-1 ring-navy/15 transition hover:bg-sand">Edit my reservation</button>
+          <div class="mt-6 flex justify-center">
+            <button type="button" data-promo-close class="rounded-xl bg-teal-dark px-8 py-3 text-sm font-bold text-white transition hover:bg-navy">Done</button>
           </div>
         </div>
       </div>
@@ -1362,8 +1426,8 @@
               <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-lagoon font-display text-base font-extrabold text-teal-dark" aria-hidden="true">V</span>
               Venmo
             </li>
-            <!-- PLACEHOLDER: the site can't take payments online yet. Add a payment link, or remove this option. -->
-            <li class="flex items-center gap-2.5 rounded-xl bg-white p-2.5 text-sm font-bold leading-tight text-navy shadow-card ring-1 ring-navy/5" data-confirm="website-payment">
+            <!-- Paid through Stripe with the "Pay now" button after reserving (README: "Payments"). -->
+            <li class="flex items-center gap-2.5 rounded-xl bg-white p-2.5 text-sm font-bold leading-tight text-navy shadow-card ring-1 ring-navy/5">
               <span class="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-sun-light text-navy" aria-hidden="true">
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 15h3"/></svg>
               </span>
@@ -1457,8 +1521,19 @@
 (function () {
   'use strict';
 
-  var BUSINESS_EMAIL = 'hafalohamovers@gmail.com';
-  var BIN_PRICE = 35; // Standard price per bin. The Monticello price is PROMO_BIN_PRICE, further down.
+  // Web3Forms emails each request to the inbox this key was created with. Its keys are meant to be
+  // public: one can only ever send to its own inbox.
+  var WEB3FORMS_KEY = '0fba20bd-a8f0-4c82-918a-4734a29bfa57';
+  var BIN_PRICE = 35; // Standard price per bin.
+  // The Monticello Special, for its pop-up and for its card in "Pay online". src/pricing.js charges
+  // the same, and `npm test` fails if the two disagree. Anyone can read the code in the page source,
+  // so it's a courtesy gate, not a secret.
+  var PROMO_CODE = 'PROMO2026';
+  var PROMO_BIN_PRICE = 20;
+  var PROMO_ALL_THREE_PRICE = 55; // All three kinds of bin together. Bins beyond those are PROMO_BIN_PRICE each.
+  var PROMO_KINDS = ['Trash', 'Recycling', 'Green waste'];
+  var PROMO_MAX_BINS = 10;
+  var PROMO_DATE = 'Thursday, November 19, 2026';
   var doc = document;
   doc.documentElement.classList.add('js');
 
@@ -1564,6 +1639,49 @@
   }
 
   /* --------------------------------------------------------------
+     Monticello Special: the code and the price
+     Shared by its pop-up (at the end) and its card in "Pay online".
+  -------------------------------------------------------------- */
+  var PROMO_CODE_WRONG = "Hmm, that code didn't work. Please check your flyer and try again, or text us at (949) 731-4378 and we'll help.";
+
+  function promoCodeMatches(value) { return value.replace(/\s+/g, '').toUpperCase() === PROMO_CODE; }
+
+  // The special's price in dollars for some bins, `kinds` of which are different kinds: all three
+  // kinds together cost PROMO_ALL_THREE_PRICE, and every other bin PROMO_BIN_PRICE.
+  function promoPrice(bins, kinds) {
+    if (kinds !== PROMO_KINDS.length) return bins * PROMO_BIN_PRICE;
+    return PROMO_ALL_THREE_PRICE + (bins - kinds) * PROMO_BIN_PRICE;
+  }
+
+  function promoRate(bins, kinds) {
+    if (kinds !== PROMO_KINDS.length) return '$' + PROMO_BIN_PRICE + ' per bin';
+    var extra = bins - kinds;
+    var extraText = extra ? ' + ' + extra + ' extra ' + (extra === 1 ? 'bin' : 'bins') + ' at $' + PROMO_BIN_PRICE : '';
+    return '$' + PROMO_ALL_THREE_PRICE + ' for all 3' + extraText;
+  }
+
+  // A wrong code gives the field a friendly shake.
+  function shake(el) {
+    el.classList.remove('promo-shake');
+    void el.offsetWidth; // Restarts the animation on a repeat miss.
+    el.classList.add('promo-shake');
+    el.focus();
+  }
+
+  // The code opens both the pop-up's form and the card, so nobody has to type it twice.
+  var promoUnlockedWith = '';
+  var promoUnlockListeners = [];
+  function onPromoUnlock(fn) {
+    if (promoUnlockedWith) fn(promoUnlockedWith);
+    else promoUnlockListeners.push(fn);
+  }
+  function unlockPromo(code) {
+    if (promoUnlockedWith) return;
+    promoUnlockedWith = code;
+    promoUnlockListeners.forEach(function (fn) { fn(code); });
+  }
+
+  /* --------------------------------------------------------------
      Booking form
   -------------------------------------------------------------- */
   var form = $('#bookingForm');
@@ -1571,11 +1689,9 @@
 
   var successPanel = $('#bookingSuccess');
   var errorSummary = $('#formErrorSummary');
-  var summaryEl = $('#summaryText');
   var notesEl = $('#f-notes');
   var notesCount = $('#notesCount');
   var dateEl = $('#f-date');
-  var lastMailtoUrl = '';
 
   // Can't book a date that's already gone.
   if (dateEl) {
@@ -1822,7 +1938,7 @@
     return '  ' + label + ' ' + dots + ' ' + value + '\n';
   }
 
-  function buildSummary() {
+  function buildSummary(ref) {
     var svcInput = form.querySelector('input[name="service"]:checked');
     var svcLabel = svcInput ? svcInput.value : 'Moving';
     var svc = currentService();
@@ -1834,6 +1950,7 @@
     out += '=========================================\n\n';
 
     out += 'SERVICE\n';
+    out += line('Reference', ref);
     out += line('Type', svcLabel);
     out += line('Date', fmtDate(val('#f-date')));
     out += line('Arrival window', val('#f-window'));
@@ -1886,17 +2003,40 @@
     return 'Booking request — ' + svcLabel + ' — ' + shortDate + ' — ' + name;
   }
 
-  function buildMailto(subject, body) {
-    var url = 'mailto:' + BUSINESS_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-    // Some mail handlers choke on very long URLs; trim the free-text notes first
-    // rather than losing the whole request.
-    if (url.length > 1900) {
-      var trimmed = body.replace(/(\n  (?:Notes|Garage code or bins outside):\n)([\s\S]*?)(\n\n----)/, function (m, head, notes, tail) {
-        return head + '    (see the full note below — it was too long to fit in this email)' + tail;
-      });
-      url = 'mailto:' + BUSINESS_EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(trimmed);
-    }
-    return url;
+  /* ---- Sending: straight to the inbox via Web3Forms ---- */
+  // Resolves true only once Web3Forms says it has the request. Anything else (offline, an error, no
+  // answer within 15 seconds) resolves false, so the caller can say it didn't go through.
+  function sendToInbox(fields) {
+    if (!window.fetch) return Promise.resolve(false);
+    var payload = { access_key: WEB3FORMS_KEY, from_name: 'Hafaloha website' };
+    Object.keys(fields).forEach(function (key) { if (fields[key]) payload[key] = fields[key]; });
+    var controller = window.AbortController ? new AbortController() : null;
+    var timer = controller ? setTimeout(function () { controller.abort(); }, 15000) : null;
+    return fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(payload),
+      signal: controller ? controller.signal : undefined
+    })
+      .then(function (res) { return res.json().then(function (data) { return res.ok && data.success === true; }); })
+      .catch(function () { return false; })
+      .then(function (sent) { clearTimeout(timer); return sent; });
+  }
+
+  // While a request is on its way the button says so, and can't be pressed twice.
+  function setSending(button, sending) {
+    var label = $('[data-btn-label]', button);
+    if (!label.hasAttribute('data-idle')) label.setAttribute('data-idle', label.textContent);
+    label.textContent = sending ? 'Sending…' : label.getAttribute('data-idle');
+    button.disabled = sending;
+  }
+
+  // Sending failed: stay on the form with everything still filled in, and say what to do next.
+  function showSendError(summary) {
+    if (!summary) return;
+    summary.textContent = "We couldn't send your request just now. Please try again, or call or text us at (949) 731-4378.";
+    summary.hidden = false;
+    summary.focus();
   }
 
   /* ---- Submit ---- */
@@ -1905,82 +2045,565 @@
 
     if (!requiredFieldsValid(form, errorSummary)) return;
 
-    var body = buildSummary();
+    var ref = makeRef();
+    var body = buildSummary(ref);
     var subject = buildSubject();
-    lastMailtoUrl = buildMailto(subject, body);
 
-    if (summaryEl) summaryEl.textContent = body;
-
-    form.hidden = true;
-    if (successPanel) {
-      successPanel.hidden = false;
-      successPanel.focus();
-      // 'instant' (not 'auto') — 'auto' defers to the CSS scroll-behavior, which
-      // would still animate for someone who asked for reduced motion.
-      successPanel.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'center' });
-    }
-
-    window.location.href = lastMailtoUrl;
-  });
-
-  /* ---- Success-panel controls ---- */
-  function wireCopyButton(btn, label, textEl) {
-    if (!btn || !label) return;
-    btn.addEventListener('click', function () {
-      var text = textEl ? textEl.textContent : '';
-      var done = function (ok) {
-        label.textContent = ok ? 'Copied' : 'Press Ctrl+C';
-        setTimeout(function () { label.textContent = 'Copy'; }, 2200);
-      };
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(function () { done(true); }, function () { selectText(textEl); done(false); });
-      } else {
-        selectText(textEl);
-        done(false);
+    var submitBtn = $('button[type="submit"]', form);
+    setSending(submitBtn, true);
+    sendToInbox({ subject: subject, name: val('#f-name'), email: val('#f-email'), phone: val('#f-phone'), message: body }).then(function (sent) {
+      setSending(submitBtn, false);
+      if (!sent) { showSendError(errorSummary); return; }
+      form.hidden = true;
+      offerBinPayment(ref);
+      if (successPanel) {
+        successPanel.hidden = false;
+        successPanel.focus();
+        // 'instant' (not 'auto') — 'auto' defers to the CSS scroll-behavior, which
+        // would still animate for someone who asked for reduced motion.
+        successPanel.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'center' });
       }
     });
-  }
-  wireCopyButton($('#copyBtn'), $('#copyBtnLabel'), summaryEl);
+  });
 
-  function selectText(textEl) {
-    if (!textEl || !window.getSelection) return;
-    var range = doc.createRange();
-    range.selectNodeContents(textEl);
-    var sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(range);
+  /* --------------------------------------------------------------
+     Paying online
+     Payments happen on Stripe's own checkout page (Stripe Checkout):
+     the page asks the Worker (src/worker.js) to open one and goes
+     there. It takes cards only, typed in or through Apple Pay (at the
+     top on Apple devices), then sends the customer back here ("Back
+     from paying", below).
+     - Bin cleaning has a set price, so its booking confirmation (and
+       the Monticello Special's) offers "Pay now". The Worker works out
+       the amount itself and refuses if it differs from the one shown.
+     - "Pay online" lists the Stripe product catalog.
+  -------------------------------------------------------------- */
+
+  // A short code that ties the booking email to its payment in Stripe.
+  function makeRef() {
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // No 0/O or 1/I, so it reads well over the phone.
+    var bytes = new Uint8Array(6);
+    if (window.crypto && window.crypto.getRandomValues) window.crypto.getRandomValues(bytes);
+    else for (var i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+    var out = 'HF-';
+    for (var j = 0; j < bytes.length; j++) out += chars.charAt(bytes[j] % chars.length);
+    return out;
   }
 
-  var reopenBtn = $('#reopenMailBtn');
-  if (reopenBtn) {
-    reopenBtn.addEventListener('click', function () {
-      if (lastMailtoUrl) window.location.href = lastMailtoUrl;
+  function money(cents) { return '$' + (cents % 100 ? (cents / 100).toFixed(2) : String(cents / 100)); }
+
+  // Asked once per visit: is online payment set up? Until the Stripe key is in place no "Pay now"
+  // shows, so the page is safe to publish either way.
+  var paymentCheck = null;
+  function onlinePaymentAvailable() {
+    if (!paymentCheck) {
+      paymentCheck = !window.fetch ? Promise.resolve(false) :
+        fetch('/api/checkout/available', { headers: { Accept: 'application/json' } })
+          .then(function (res) { return res.ok ? res.json() : {}; })
+          .then(function (data) { return data.available === true; })
+          .catch(function () { return false; });
+    }
+    return paymentCheck;
+  }
+
+  var PAYMENT_DOWN = "Online payment isn't working right now. You can pay after the service instead, or call or text us at (949) 731-4378.";
+  var PRICES_CHANGED = 'Our prices changed since this page loaded. Please refresh the page and try again, or call or text us at (949) 731-4378.';
+
+  // Asks the Worker to open a Stripe checkout for order, and goes there. The button says what's
+  // happening meanwhile; fail(message) is called if it can't.
+  function startCheckout(button, order, fail) {
+    button.disabled = true;
+    $('[data-btn-label]', button).textContent = 'Opening secure checkout…';
+    fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      body: JSON.stringify(order)
+    })
+      .then(function (res) { return res.json().then(function (data) { return { status: res.status, data: data }; }); })
+      .then(function (r) {
+        if (r.status === 200 && typeof r.data.url === 'string' && r.data.url.indexOf('https://') === 0) {
+          window.location.assign(r.data.url);
+          return;
+        }
+        fail(r.status === 409 ? PRICES_CHANGED : PAYMENT_DOWN);
+      })
+      .catch(function () {
+        fail("We couldn't reach the payment service. Please check your connection and try again, or call or text us at (949) 731-4378.");
+      });
+  }
+
+  // Back to the button's resting label.
+  function resetPayButton(button) {
+    button.disabled = false;
+    $('[data-btn-label]', button).textContent = button.getAttribute('data-idle-label') || 'Pay now';
+  }
+
+  function payFailed(button, error) {
+    return function (message) {
+      resetPayButton(button);
+      error.textContent = message;
+      error.hidden = false;
+      error.focus();
+    };
+  }
+
+  // Readies a confirmation's "Pay now" block for one booking. order is what /api/checkout expects.
+  function offerPayment(block, order) {
+    if (!block) return;
+    var button = $('[data-pay-btn]', block);
+    var error = $('[data-pay-error]', block);
+    button.setAttribute('data-idle-label', 'Pay ' + money(order.expectedTotal) + ' now');
+    resetPayButton(button);
+    error.hidden = true;
+    button.onclick = function () {
+      error.hidden = true;
+      startCheckout(button, order, payFailed(button, error));
+    };
+    block.hidden = true;
+    onlinePaymentAvailable().then(function (available) { block.hidden = !available; });
+  }
+
+  // The booking form: an exact number of bins only ("6 or more" needs a head count first).
+  function offerBinPayment(ref) {
+    var block = successPanel && $('[data-pay]', successPanel);
+    if (!block) return;
+    var count = /^(\d+) bins?$/.exec(val('#f-bins'));
+    if (currentService() !== 'bins' || !count) { block.hidden = true; return; }
+    var bins = Number(count[1]);
+    offerPayment(block, {
+      kind: 'bins', bins: bins, expectedTotal: bins * BIN_PRICE * 100, ref: ref,
+      name: val('#f-name'), phone: val('#f-phone'), email: val('#f-email'), address: val('#f-from'), date: val('#f-date')
     });
   }
 
-  var editBtn = $('#editBtn');
-  if (editBtn) {
-    editBtn.addEventListener('click', function () {
-      if (successPanel) successPanel.hidden = true;
-      form.hidden = false;
-      var first = $('#f-name');
+  // The browser's Back button from Stripe's page can bring this page back exactly as it was left,
+  // mid-"Opening secure checkout…", so put every pay button back.
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) $$('[data-pay-btn]').forEach(resetPayButton);
+  });
+
+  /* ---- Pay online: the Stripe product catalog ---- */
+  // The products and prices come from the Stripe Dashboard through the Worker (/api/catalog).
+  // The area and its menu links show only once the catalog arrives, so until Stripe is set up
+  // the page is unchanged.
+  var payArea = $('#payArea');
+  var payCatalog = $('#payCatalog');
+  var payResultCard = $('#payResultCard');
+
+  function showPayArea() {
+    if (!payArea || !payArea.hidden) return;
+    payArea.hidden = false;
+    $$('[data-pay-link]').forEach(function (link) { link.hidden = false; });
+    // The area ends with its own wave into the footer.
+    var footerWave = $('[data-wave-before-footer]');
+    if (footerWave) footerWave.hidden = true;
+  }
+
+  function esc(text) {
+    return String(text).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  // An icon per kind of service, matching the "Services & prices" list.
+  var STROKE = ' fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+  var ICONS = {
+    moving: ['bg-teal/10 text-teal', '<svg class="h-7 w-7" viewBox="0 0 24 24"' + STROKE + '><path d="M2 7h10v9H2z"/><path d="M12 10h4.5l3.5 3.5V16h-8z"/><circle cx="6" cy="18" r="2"/><circle cx="16.5" cy="18" r="2"/></svg>'],
+    junk: ['bg-leaf/10 text-leaf', '<svg class="h-7 w-7" viewBox="0 0 24 24"' + STROKE + '><path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 12.2A2 2 0 009 21h6a2 2 0 002-1.8L18 7"/><path d="M10 11v6M14 11v6"/></svg>'],
+    labor: ['bg-kraft/15 text-kraft', '<svg class="h-7 w-7" viewBox="0 0 24 24"' + STROKE + '><path d="M3.5 8.5l8.5-4 8.5 4-8.5 4z"/><path d="M3.5 8.5v7l8.5 4 8.5-4v-7"/><path d="M12 12.5v7"/></svg>'],
+    bins: ['bg-lagoon-light text-teal', '<svg class="h-8 w-7" viewBox="0 0 48 64" aria-hidden="true"><use href="#i-bin"/></svg>'],
+    extra: ['bg-coral/10 text-coral-dark', '<svg class="h-7 w-7" viewBox="0 0 24 24"' + STROKE + '><path d="M18 11V6a2 2 0 0 0-4 0M14 10V4a2 2 0 0 0-4 0v2M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-6-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg>'],
+    other: ['bg-navy/5 text-navy', '<svg class="h-7 w-7" viewBox="0 0 24 24"' + STROKE + '><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/></svg>']
+  };
+  // The kind of service a product is, going by its name. It picks the card's icon and checklist.
+  function kindOf(name) {
+    var n = name.toLowerCase();
+    if (/\bbins?\b/.test(n)) return 'bins';
+    if (/junk/.test(n)) return 'junk';
+    if (/labor|labour/.test(n)) return 'labor';
+    if (/hands?\b/.test(n)) return 'extra';
+    if (/mov/.test(n)) return 'moving';
+    return 'other';
+  }
+
+  // Each card's checklist, by kind of service, saying what the rest of the site says about it. A
+  // product's own Marketing feature list in the Stripe Dashboard takes its place, and a product of
+  // another kind with no list shows its description instead.
+  var FEATURES = {
+    moving: ['Two movers and a truck', 'Homes, apartments and small offices', 'Across Orange County'],
+    labor: ['Two movers', 'You provide the truck', 'Loading and unloading'],
+    // PLACEHOLDER: confirm these are the bins you take (the hero's bin cleaning row says the same).
+    bins: ['Trash, recycling or green waste', 'Priced per bin', 'Across Orange County'],
+    junk: ['Furniture, appliances and cleanouts', 'Priced by the load', 'Text us a photo for a quote'],
+    extra: ['Help with personal projects', 'Call or text us for a quote', 'Across Orange County']
+  };
+
+  // "1 bin", "3 hours"; a product without a unit label in Stripe counts in items.
+  function unitCount(unit, count) { unit = unit || 'item'; return count + ' ' + (count === 1 ? unit : unit + 's'); }
+
+  var ARROW = '<svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10h11M11 5l5 5-5 5"/></svg>';
+
+  function checkIcon(size) {
+    return '<svg class="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>';
+  }
+
+  /* ---- The cards: name and badge, the price, a rule, a checklist, then the button ---- */
+  // A card with a badge stands out with a bolder ring.
+  function cardStart(attribute, featured) {
+    return '<article ' + attribute + ' class="flex flex-col gap-4 rounded-2xl bg-white p-6 shadow-card transition duration-300 hover:-translate-y-0.5 hover:shadow-lift ' +
+      (featured ? 'ring-2 ring-teal' : 'ring-1 ring-navy/10') + '">';
+  }
+
+  function cardHead(icon, name, badge) {
+    return '<div class="flex items-center justify-between gap-3">' +
+        '<div class="flex min-w-0 items-center gap-3">' +
+          '<span class="grid h-11 w-11 shrink-0 place-items-center rounded-xl ' + icon[0] + '">' + icon[1] + '</span>' +
+          '<h3 class="font-display text-lg font-bold leading-tight text-navy">' + esc(name) + '</h3>' +
+        '</div>' +
+        (badge ? '<span data-badge class="shrink-0 whitespace-nowrap rounded-full bg-teal-dark px-2.5 py-1 text-xs font-bold leading-none text-white">' + esc(badge) + '</span>' : '') +
+      '</div>';
+  }
+
+  var RULE = '<hr class="border-navy/10">';
+
+  function checklist(items) {
+    return '<ul class="flex flex-col gap-2">' + items.map(function (text) {
+      return '<li class="flex items-start gap-2 text-sm leading-snug text-navy/80"><span class="mt-px shrink-0 text-leaf">' + checkIcon('h-4 w-4') + '</span>' + esc(text) + '</li>';
+    }).join('') + '</ul>';
+  }
+
+  // "How many hours?  − 2 hours +". The label (id) names the − / + group.
+  function stepperRow(id, label, hint, unit) {
+    return '<div class="flex items-center justify-between gap-3">' +
+        '<p class="min-w-0 text-sm"><span id="' + id + '" class="block font-semibold text-navy">' + label + '</span>' +
+          (hint ? '<span class="block text-xs leading-snug text-navy/70">' + hint + '</span>' : '') + '</p>' +
+        '<div class="flex shrink-0 items-center rounded-xl bg-sand ring-1 ring-navy/10" role="group" aria-labelledby="' + id + '">' +
+          '<button type="button" data-step="-1" class="grid h-10 w-10 place-items-center rounded-l-xl text-xl font-bold leading-none text-navy transition hover:bg-navy/5 disabled:cursor-not-allowed disabled:opacity-30" aria-label="One ' + unit + ' fewer">&minus;</button>' +
+          '<span data-qty class="min-w-[4.75rem] px-1 text-center text-sm font-bold text-navy" aria-live="polite"></span>' +
+          '<button type="button" data-step="1" class="grid h-10 w-10 place-items-center rounded-r-xl text-xl font-bold leading-none text-navy transition hover:bg-navy/5 disabled:cursor-not-allowed disabled:opacity-30" aria-label="One more ' + unit + '">+</button>' +
+        '</div>' +
+      '</div>';
+  }
+
+  var PAY_BUTTON =
+    '<button type="button" data-pay-btn class="flex w-full items-center justify-center gap-2 rounded-xl bg-teal px-5 py-3.5 text-base font-bold text-white transition hover:bg-teal-dark active:translate-y-px disabled:cursor-wait disabled:opacity-70">' +
+      '<span data-btn-label></span>' + ARROW +
+    '</button>' +
+    '<p data-pay-error tabindex="-1" class="text-sm font-semibold text-red-700" role="alert" hidden></p>';
+
+  function strings(list) {
+    return Array.isArray(list) ? list.filter(function (text) { return typeof text === 'string' && text.trim(); }) : [];
+  }
+
+  function productCard(item, index) {
+    var kind = kindOf(item.name);
+    var quoted = item.amount === null;
+    var unit = esc(item.unit || 'item');
+    var badge = typeof item.badge === 'string' ? item.badge : '';
+    var features = strings(item.features);
+    if (!features.length) features = FEATURES[kind] || [];
+    var price = quoted
+      ? '<div><p class="font-display text-2xl font-extrabold tracking-tight text-navy">Quoted per job</p>' +
+          '<p class="mt-1 text-sm text-navy/70">You enter the amount we quoted at checkout.</p></div>'
+      : '<p class="flex items-baseline gap-1"><span class="font-display text-3xl font-extrabold tracking-tight text-navy">' + money(item.amount) + '</span>' +
+          (item.unit ? '<span class="text-sm font-semibold text-navy/70">/ ' + unit + '</span>' : '') + '</p>';
+    var details = features.length ? checklist(features)
+      : item.description ? '<p class="text-sm leading-relaxed text-navy/80">' + esc(item.description) + '</p>' : '';
+    var quantity = !quoted && item.maxQuantity > 1 ? stepperRow('payQty' + index, 'How many ' + unit + 's?', '', unit) : '';
+    return cardStart('data-product="' + index + '"', Boolean(badge)) +
+        cardHead(ICONS[kind], item.name, badge) +
+        price +
+        (details ? RULE + details : '') +
+        '<div class="mt-auto flex flex-col gap-4 pt-2">' + quantity + PAY_BUTTON + '</div>' +
+      '</article>';
+  }
+
+  function setUpCard(card, item) {
+    var button = $('[data-pay-btn]', card);
+    var error = $('[data-pay-error]', card);
+    var qtyEl = $('[data-qty]', card);
+    var fewer = $('[data-step="-1"]', card);
+    var more = $('[data-step="1"]', card);
+    var quoted = item.amount === null;
+    var qty = 1;
+
+    function show() {
+      if (qtyEl) qtyEl.textContent = unitCount(item.unit, qty);
+      if (fewer) fewer.disabled = qty <= 1;
+      if (more) more.disabled = qty >= item.maxQuantity;
+      var idle = quoted ? 'Pay your quote' : 'Pay ' + money(item.amount * qty);
+      button.setAttribute('data-idle-label', idle);
+      if (!button.disabled) $('[data-btn-label]', button).textContent = idle;
+    }
+
+    $$('[data-step]', card).forEach(function (step) {
+      step.addEventListener('click', function () {
+        qty = Math.min(item.maxQuantity, Math.max(1, qty + Number(step.getAttribute('data-step'))));
+        show();
+      });
+    });
+    button.addEventListener('click', function () {
+      error.hidden = true;
+      startCheckout(button, {
+        kind: 'catalog', price: item.price, quantity: qty,
+        expectedTotal: quoted ? null : item.amount * qty, ref: makeRef()
+      }, payFailed(button, error));
+    });
+    show();
+  }
+
+  function validItem(item) {
+    return item && typeof item.price === 'string' && typeof item.name === 'string' &&
+      (item.amount === null || (typeof item.amount === 'number' && item.amount > 0)) &&
+      typeof item.maxQuantity === 'number' && item.maxQuantity >= 1;
+  }
+
+  /* ---- Pay online: the Monticello Special ---- */
+  // Its card stays locked until the code is in, from the flyer (here or in the pop-up). Then the
+  // customer ticks their bins, sees the special's price, and pays it on Stripe's page, which asks for
+  // their name, phone and address, since no reservation form came first. The Worker prices it again
+  // (src/pricing.js), and the catalog leaves the card out once the special can't be paid for.
+  var BIN_TINTS = { 'Trash': 'text-navy', 'Recycling': 'text-teal', 'Green waste': 'text-leaf' }; // As in the pop-up.
+
+  function promoCard() {
+    var boxes = PROMO_KINDS.map(function (kind, i) {
+      return '<label class="flex cursor-pointer items-center gap-3 rounded-xl px-2 py-1.5 transition hover:bg-sand">' +
+          '<input id="promoCardBin' + i + '" type="checkbox" name="promoCardBin" value="' + esc(kind) + '" class="peer sr-only">' +
+          '<span class="grid h-5 w-5 shrink-0 place-items-center rounded-md bg-white text-transparent ring-1 ring-navy/30 transition peer-checked:bg-leaf peer-checked:text-white peer-checked:ring-leaf peer-focus-visible:ring-2 peer-focus-visible:ring-teal peer-focus-visible:ring-offset-2" aria-hidden="true">' + checkIcon('h-3.5 w-3.5') + '</span>' +
+          '<svg class="h-5 w-4 shrink-0 ' + (BIN_TINTS[kind] || 'text-navy') + '" viewBox="0 0 48 64" aria-hidden="true"><use href="#i-bin"/></svg>' +
+          '<span class="text-sm font-semibold text-navy">' + esc(kind) + '</span>' +
+        '</label>';
+    }).join('');
+    var hibiscus = ['bg-hibiscus/50 text-coral', '<svg class="h-7 w-7" viewBox="0 0 128 128" aria-hidden="true"><use href="#i-hibiscus"/></svg>'];
+    return cardStart('data-promo-card', true) +
+        cardHead(hibiscus, 'Monticello Special', 'Code required') +
+        // Filled in by show() in setUpPromoCard once the card is unlocked.
+        '<div aria-live="polite" aria-atomic="true">' +
+          '<p class="flex flex-wrap items-baseline gap-x-1.5">' +
+            '<span data-promo-amount class="font-display text-3xl font-extrabold tracking-tight text-coral-dark">$' + PROMO_BIN_PRICE + '</span>' +
+            '<span data-promo-per class="text-sm font-semibold text-navy/70">/ bin</span>' +
+            '<s class="text-sm font-semibold text-navy/70 decoration-coral decoration-2"><span class="sr-only">regular price </span><span data-promo-was>$' + BIN_PRICE + '</span></s>' +
+          '</p>' +
+          '<p data-promo-note class="mt-1 text-sm text-navy/70">With the code from your Monticello flyer.</p>' +
+        '</div>' +
+        RULE +
+        '<div data-promo-locked class="flex flex-1 flex-col gap-4">' +
+          checklist(['$' + PROMO_BIN_PRICE + ' a bin, regularly $' + BIN_PRICE, 'All 3 bins for $' + PROMO_ALL_THREE_PRICE, PROMO_DATE]) +
+          '<form class="mt-auto pt-2" novalidate>' +
+            '<div class="field">' +
+              '<label for="promoCardCode" class="mb-1.5 block text-sm font-semibold text-navy">Community promo code</label>' +
+              '<input id="promoCardCode" type="text" required autocomplete="off" autocapitalize="characters" spellcheck="false" enterkeyhint="go" data-label="Promo code" data-msg="Please enter your community promo code." ' +
+                'class="w-full rounded-xl border-0 bg-sand px-4 py-3 font-bold uppercase tracking-wider text-navy ring-1 ring-navy/15 transition placeholder:font-medium placeholder:normal-case placeholder:tracking-normal placeholder:text-navy/50 focus:ring-2 focus:ring-teal" placeholder="Enter your code">' +
+              '<p class="err mt-1.5 hidden text-sm font-semibold text-red-700" role="alert"></p>' +
+            '</div>' +
+            '<button type="submit" class="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-teal px-5 py-3.5 text-base font-bold text-white transition hover:bg-teal-dark active:translate-y-px">Unlock my price' + ARROW + '</button>' +
+          '</form>' +
+        '</div>' +
+        '<div data-promo-unlocked role="group" aria-labelledby="promoCardBins" tabindex="-1" class="flex flex-1 flex-col gap-4 outline-none" hidden>' +
+          '<fieldset class="field">' +
+            '<legend id="promoCardBins" class="text-sm font-semibold text-navy">Which bins? <span class="font-normal text-navy/70">(tick all that apply)</span></legend>' +
+            '<div class="-mx-2 mt-1.5 flex flex-col">' + boxes + '</div>' +
+            '<p data-promo-all class="promo-pop mt-2 rounded-xl bg-sun-light px-3 py-1.5 text-center text-sm font-extrabold text-navy" hidden>' +
+              '<svg class="mr-1 inline-block h-3.5 w-3.5 text-coral-dark" viewBox="0 0 24 24" aria-hidden="true"><use href="#i-sparkle"/></svg>$' + PROMO_ALL_THREE_PRICE + ' for all 3' +
+            '</p>' +
+            '<p class="err mt-1.5 hidden text-sm font-semibold text-red-700" role="alert"></p>' +
+          '</fieldset>' +
+          '<div class="mt-auto flex flex-col gap-4 pt-2">' +
+            stepperRow('promoCardExtra', 'Extra bins', '$' + PROMO_BIN_PRICE + ' each', 'bin') +
+            PAY_BUTTON +
+          '</div>' +
+        '</div>' +
+      '</article>';
+  }
+
+  function setUpPromoCard(card) {
+    var locked = $('[data-promo-locked]', card);
+    var unlocked = $('[data-promo-unlocked]', card);
+    var codeForm = $('form', locked);
+    var codeEl = $('#promoCardCode', card);
+    var boxes = $$('input[type="checkbox"]', unlocked);
+    var fewer = $('[data-step="-1"]', unlocked);
+    var more = $('[data-step="1"]', unlocked);
+    var button = $('[data-pay-btn]', unlocked);
+    var error = $('[data-pay-error]', unlocked);
+    var extra = 0; // Bins beyond one of each kind ticked.
+
+    function ticked() {
+      return boxes.filter(function (box) { return box.checked; }).map(function (box) { return box.value; });
+    }
+
+    // The price follows the ticked bins: the special's rate until there are some, then their total.
+    function show() {
+      var kinds = ticked().length;
+      extra = kinds ? Math.min(extra, PROMO_MAX_BINS - kinds) : 0;
+      var bins = kinds + extra;
+      var total = promoPrice(bins, kinds);
+      $('[data-promo-amount]', card).textContent = '$' + (kinds ? total : PROMO_BIN_PRICE);
+      $('[data-promo-per]', card).textContent = kinds ? 'for ' + unitCount('bin', bins) : '/ bin';
+      $('[data-promo-was]', card).textContent = '$' + (kinds ? bins : 1) * BIN_PRICE;
+      $('[data-promo-note]', card).textContent = kinds ? 'You save $' + (bins * BIN_PRICE - total) + '.' : 'Tick your bins to see your price.';
+      $('[data-promo-all]', card).hidden = kinds !== PROMO_KINDS.length;
+      $('[data-qty]', unlocked).textContent = unitCount('bin', extra);
+      fewer.disabled = extra < 1;
+      more.disabled = !kinds || bins >= PROMO_MAX_BINS;
+      var idle = kinds ? 'Pay $' + total : 'Pay now';
+      button.setAttribute('data-idle-label', idle);
+      if (!button.disabled) $('[data-btn-label]', button).textContent = idle;
+    }
+
+    codeEl.addEventListener('input', function () {
+      if (codeEl.getAttribute('aria-invalid') === 'true') validateField(codeEl);
+    });
+    codeForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (!validateField(codeEl)) { shake(codeEl); return; }
+      if (!promoCodeMatches(codeEl.value)) { setFieldError(codeEl, PROMO_CODE_WRONG); shake(codeEl); return; }
+      unlockPromo(codeEl.value);
+      unlocked.focus({ preventScroll: true });
+    });
+    // Unlocked here or in the pop-up.
+    onPromoUnlock(function () {
+      locked.hidden = true;
+      unlocked.hidden = false;
+      $('[data-badge]', card).textContent = 'Unlocked';
+      show();
+    });
+
+    boxes.forEach(function (box) {
+      box.addEventListener('change', function () {
+        if (boxes[0].getAttribute('aria-invalid') === 'true') clearFieldError(boxes[0]);
+        show();
+      });
+    });
+    $$('[data-step]', unlocked).forEach(function (step) {
+      step.addEventListener('click', function () {
+        extra = Math.max(0, extra + Number(step.getAttribute('data-step')));
+        show();
+      });
+    });
+    button.addEventListener('click', function () {
+      error.hidden = true;
+      var kinds = ticked();
+      if (!kinds.length) {
+        // The message sits under the group, on its first box.
+        setFieldError(boxes[0], 'Please tick at least one bin.');
+        boxes[0].focus();
+        return;
+      }
+      var bins = kinds.length + extra;
+      startCheckout(button, {
+        kind: 'monticello', from: 'pay', code: promoUnlockedWith, bins: bins, binTypes: kinds,
+        expectedTotal: promoPrice(bins, kinds.length) * 100, ref: makeRef()
+      }, payFailed(button, error));
+    });
+  }
+
+  if (payArea && payCatalog && window.fetch) {
+    fetch('/api/catalog', { headers: { Accept: 'application/json' } })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) {
+        var items = data && Array.isArray(data.products) ? data.products.filter(validItem) : [];
+        // The Monticello Special's card leads while the special can still be paid for.
+        var monticello = Boolean(data && data.monticello === true);
+        if (!items.length && !monticello) return;
+        payCatalog.innerHTML = (monticello ? promoCard() : '') + items.map(productCard).join('');
+        $$('[data-product]', payCatalog).forEach(function (card) {
+          setUpCard(card, items[Number(card.getAttribute('data-product'))]);
+        });
+        if (monticello) setUpPromoCard($('[data-promo-card]', payCatalog));
+        showPayArea();
+        // A link straight to hafaloha.us/#pay lands before the section shows, so go there now.
+        if (window.location.hash === '#pay' && !checkoutReturn) {
+          $('#pay').scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'start' });
+        }
+      })
+      .catch(function () {});
+  }
+
+  /* ---- Back from paying ---- */
+  // Stripe sends the customer back to ?checkout=success&session_id=… once they've paid, or to
+  // ?checkout=cancel if they backed out ("from=pay" when they started in "Pay online"). The panel
+  // only says a payment went through once the server has checked with Stripe, never on the address.
+  var checkoutReturn = (function () {
+    var params;
+    try { params = new URLSearchParams(window.location.search); } catch (err) { return null; }
+    var state = params.get('checkout');
+    if (state !== 'success' && state !== 'cancel') return null;
+    // Tidy the address bar, so a refresh or a shared link doesn't replay this.
+    try { history.replaceState(null, '', window.location.pathname + window.location.hash); } catch (err) {}
+    return { state: state, sessionId: params.get('session_id') || '', fromPay: params.get('from') === 'pay' };
+  })();
+
+  var resultPanel = $('#paymentResult');
+  // What the result stands in for: the booking form, or the "Pay online" cards for a payment made there.
+  var resultForm = form;
+
+  function showPaymentResult(icon, title, text) {
+    $$('[data-result-icon]', resultPanel).forEach(function (el) { el.hidden = el.getAttribute('data-result-icon') !== icon; });
+    $('#paymentResultTitle').textContent = title;
+    $('#paymentResultText').textContent = text;
+    resultForm.hidden = true;
+    if (successPanel) successPanel.hidden = true;
+    resultPanel.hidden = false;
+    resultPanel.scrollIntoView({ behavior: reduceMotion ? 'instant' : 'smooth', block: 'center' });
+    resultPanel.focus({ preventScroll: true });
+  }
+
+  if (checkoutReturn && resultPanel) {
+    var resultBack = $('#paymentResultBack');
+    var fromPay = checkoutReturn.fromPay && payResultCard && payCatalog;
+    // A payment started in "Pay online" reports back there, in place of its cards.
+    if (fromPay) {
+      resultForm = payCatalog;
+      payResultCard.appendChild(resultPanel);
+      payResultCard.hidden = false;
+      resultBack.textContent = 'Pay for something else';
+      showPayArea();
+    }
+    resultBack.addEventListener('click', function () {
+      resultPanel.hidden = true;
+      if (fromPay) payResultCard.hidden = true;
+      resultForm.hidden = false;
+      var first = $('button, input, select, textarea', resultForm);
       if (first) first.focus();
     });
+
+    var stillIn = fromPay
+      ? 'You can try again whenever you like. Questions? Call or text us at (949) 731-4378.'
+      : 'Your booking request is still in, and you can pay after the service. Questions? Call or text us at (949) 731-4378.';
+    if (checkoutReturn.state === 'cancel') {
+      showPaymentResult('info', 'Payment cancelled', 'No charge was made. ' + stillIn);
+    } else {
+      showPaymentResult('', 'Checking your payment…', '');
+      fetch('/api/checkout/session?id=' + encodeURIComponent(checkoutReturn.sessionId), { headers: { Accept: 'application/json' } })
+        .then(function (res) { if (!res.ok) throw new Error('status ' + res.status); return res.json(); })
+        .then(function (s) {
+          var amount = typeof s.amountTotal === 'number' ? ' of ' + money(s.amountTotal) : '';
+          var ref = s.ref ? ' Your reference is ' + s.ref + '.' : '';
+          if (s.status === 'complete' && s.paymentStatus === 'paid') {
+            showPaymentResult('paid', 'Payment received!', 'Thanks! Your payment' + amount + ' went through.' + ref + " We'll be in touch to confirm the details.");
+          } else if (s.status === 'complete') {
+            showPaymentResult('info', 'Payment processing', 'Thanks! Your payment' + amount + ' is on its way; bank payments take a few days to clear.' + ref + " We'll be in touch.");
+          } else {
+            showPaymentResult('info', 'Payment not finished', 'Nothing was charged. ' + stillIn);
+          }
+        })
+        .catch(function () {
+          showPaymentResult('info', "We couldn't confirm your payment", "We couldn't check on your payment just now. Please call or text us at (949) 731-4378 and we'll confirm it for you.");
+        });
+    }
   }
 
   /* --------------------------------------------------------------
      Monticello Special pop-up
      It has its own form, price and email. A valid code only reveals
      that form, so the standard price and the main form never change.
+     The same code unlocks the special's card in "Pay online", and
+     the other way round. The code and prices are at the top.
   -------------------------------------------------------------- */
   var promo = $('#promoDialog');
   if (!promo || !promo.showModal) return;
 
-  // Anyone can read this in the page source, so it's a courtesy gate, not a secret.
-  var PROMO_CODE = 'PROMO2026';
-  var PROMO_BIN_PRICE = 20;
-  var PROMO_ALL_THREE_PRICE = 55; // All three kinds of bin together. Bins beyond those are PROMO_BIN_PRICE each.
-  var PROMO_DATE = 'Thursday, November 19, 2026';
   var PROMO_DISMISSED_KEY = 'hafaloha-monticello-dismissed';
 
   var promoScroll = $('#promoScroll');
@@ -1995,8 +2618,6 @@
   var promoBinTypes = $$('input[name="binType"]', promoForm);
   var promoAllThreeEl = $('#promoAllThree');
   var promoBinsChosen = 1; // What the dropdown was last set to; ticking kinds can raise the count above it.
-  var promoSummaryEl = $('#promoSummaryText');
-  var promoMailtoUrl = '';
 
   /* ---- Open and close ---- */
   function openPromo() {
@@ -2048,13 +2669,6 @@
   }
 
   /* ---- Promo code ---- */
-  function shakePromoCode() {
-    promoCodeEl.classList.remove('promo-shake');
-    void promoCodeEl.offsetWidth; // Restarts the animation on a repeat miss.
-    promoCodeEl.classList.add('promo-shake');
-    promoCodeEl.focus();
-  }
-
   promoCodeEl.addEventListener('input', function () {
     if (promoCodeEl.getAttribute('aria-invalid') === 'true') validateField(promoCodeEl);
   });
@@ -2062,15 +2676,25 @@
   promoCodeForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
-    if (!validateField(promoCodeEl)) { shakePromoCode(); return; }
+    if (!validateField(promoCodeEl)) { shake(promoCodeEl); return; }
 
-    if (promoCodeEl.value.replace(/\s+/g, '').toUpperCase() !== PROMO_CODE) {
-      setFieldError(promoCodeEl, "Hmm, that code didn't work. Please check your flyer and try again, or text us at (949) 731-4378 and we'll help.");
-      shakePromoCode();
+    if (!promoCodeMatches(promoCodeEl.value)) {
+      setFieldError(promoCodeEl, PROMO_CODE_WRONG);
+      shake(promoCodeEl);
       return;
     }
 
+    unlockPromo(promoCodeEl.value);
     showPromoStep(promoStepForm);
+  });
+
+  // Unlocked here, or first on the "Pay online" card: from then on the pop-up opens at its form.
+  onPromoUnlock(function (code) {
+    promoCodeEl.value = code;
+    if (!promoStepCode.hidden) {
+      promoStepCode.hidden = true;
+      promoStepForm.hidden = false;
+    }
   });
 
   /* ---- Live total ---- */
@@ -2080,19 +2704,9 @@
     return promoBinTypes.filter(function (box) { return box.checked; }).map(function (box) { return box.value; });
   }
 
-  function allThreeTicked() { return tickedBinTypes().length === promoBinTypes.length; }
-
-  function promoTotal(bins) {
-    if (!allThreeTicked()) return bins * PROMO_BIN_PRICE;
-    return PROMO_ALL_THREE_PRICE + (bins - promoBinTypes.length) * PROMO_BIN_PRICE;
-  }
-
-  function promoRateText(bins) {
-    if (!allThreeTicked()) return '$' + PROMO_BIN_PRICE + ' per bin';
-    var extra = bins - promoBinTypes.length;
-    var extraText = extra ? ' + ' + extra + ' extra ' + (extra === 1 ? 'bin' : 'bins') + ' at $' + PROMO_BIN_PRICE : '';
-    return '$' + PROMO_ALL_THREE_PRICE + ' for all 3' + extraText;
-  }
+  function allThreeTicked() { return tickedBinTypes().length === PROMO_KINDS.length; }
+  function promoTotal(bins) { return promoPrice(bins, tickedBinTypes().length); }
+  function promoRateText(bins) { return promoRate(bins, tickedBinTypes().length); }
 
   function updatePromoTotal() {
     var bins = Number(promoBinsEl.value);
@@ -2131,7 +2745,7 @@
   /* ---- Reservation: same validation and email hand-off as the main form ---- */
   validateAsYouGo(promoForm);
 
-  function buildPromoSummary() {
+  function buildPromoSummary(ref) {
     var bins = Number(promoBinsEl.value);
     var notes = val('#m-notes');
 
@@ -2141,6 +2755,7 @@
     out += '============================\n\n';
 
     out += 'SERVICE\n';
+    out += line('Reference', ref);
     out += line('Type', 'Bin cleaning (Monticello Special)');
     out += line('Service date', PROMO_DATE);
     out += line('Promo code', PROMO_CODE);
@@ -2176,30 +2791,41 @@
     return out;
   }
 
+  // The special's "Pay now": the same checkout, at the Monticello price ("Paying online", above).
+  function offerPromoPayment(ref) {
+    var bins = Number(promoBinsEl.value);
+    offerPayment($('[data-pay]', promoStepSend), {
+      kind: 'monticello', bins: bins, binTypes: tickedBinTypes(), code: promoCodeEl.value,
+      expectedTotal: promoTotal(bins) * 100, ref: ref,
+      name: val('#m-name'), phone: val('#m-phone'), email: val('#m-email'), address: val('#m-address')
+    });
+  }
+
   promoForm.addEventListener('submit', function (e) {
     e.preventDefault();
 
     if (!requiredFieldsValid(promoForm, $('#promoFormError'))) return;
 
-    var body = buildPromoSummary();
+    var ref = makeRef();
+    var body = buildPromoSummary(ref);
     var subject = 'Booking request — Monticello Special — Thu, Nov 19 — ' + binCount(Number(promoBinsEl.value)) + ' — ' + val('#m-name');
-    promoMailtoUrl = buildMailto(subject, body);
-    promoSummaryEl.textContent = body;
 
-    showPromoStep(promoStepSend);
-    window.location.href = promoMailtoUrl;
+    var submitBtn = $('button[type="submit"]', promoForm);
+    setSending(submitBtn, true);
+    sendToInbox({ subject: subject, name: val('#m-name'), email: val('#m-email'), phone: val('#m-phone'), message: body }).then(function (sent) {
+      setSending(submitBtn, false);
+      if (!sent) { showSendError($('#promoFormError')); return; }
+      offerPromoPayment(ref);
+      showPromoStep(promoStepSend);
+    });
   });
 
-  wireCopyButton($('#promoCopyBtn'), $('#promoCopyBtnLabel'), promoSummaryEl);
-  $('#promoReopenMailBtn').addEventListener('click', function () {
-    if (promoMailtoUrl) window.location.href = promoMailtoUrl;
-  });
-  $('#promoEditBtn').addEventListener('click', function () { showPromoStep(promoStepForm); });
 
   /* ---- First visit ---- */
   var promoDismissed = false;
   try { promoDismissed = sessionStorage.getItem(PROMO_DISMISSED_KEY) === '1'; } catch (err) {}
-  if (!promoDismissed) openPromo();
+  // Not when Stripe has just sent the customer back: the payment result comes first.
+  if (!promoDismissed && !checkoutReturn) openPromo();
 })();
 </script>
 

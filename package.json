@@ -1,0 +1,14 @@
+{
+  "name": "hafaloha",
+  "private": true,
+  "type": "module",
+  "description": "hafaloha.us: a static page plus a small Cloudflare Worker that takes bin-cleaning payments through Stripe Checkout.",
+  "scripts": {
+    "dev": "npx wrangler dev --infer-origin-from-routes=false",
+    "deploy": "npx wrangler deploy",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "stripe": "23.1.0"
+  }
+}

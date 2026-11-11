@@ -1,12 +1,21 @@
 // Cloudflare Workers: serves the files in public/ as a static site at hafaloha.us and
-// www.hafaloha.us. Cloudflare creates the DNS records and HTTPS certificates for both.
-// Publish changes with `npx wrangler deploy` (log in once per computer: `npx wrangler login`).
-// Only public/ is uploaded, so the README and local files never go online.
+// www.hafaloha.us, and runs src/worker.js for the /api/ paths that take payments through Stripe.
+// Cloudflare creates the DNS records and HTTPS certificates for both hostnames.
+// Publish changes with `npx wrangler deploy` (once per computer: `npm install`, and log in with
+// `npx wrangler login`). Only public/ and the bundled worker are uploaded, so the README and
+// local files (including .dev.vars) never go online. Stripe's keys are Worker secrets: see README.
 {
   "name": "hafaloha",
+  "main": "src/worker.js",
   "compatibility_date": "2026-10-01",
   "assets": {
-    "directory": "./public"
+    "directory": "./public",
+    "binding": "ASSETS"
+  },
+  // Workers Logs: the payment API's log lines (each paid booking, any errors) show up in the
+  // Cloudflare dashboard under this Worker's Logs.
+  "observability": {
+    "enabled": true
   },
   "routes": [
     { "pattern": "hafaloha.us", "custom_domain": true },
